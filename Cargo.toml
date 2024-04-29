@@ -1,0 +1,14 @@
+[package]
+edition = "2021"
+name = "dropout"
+description = "Drop your objects out of main thread"
+version = "0.1.0"
+authors = ["Matthieu Gautier <mgautier@kymeria.fr>"]
+repository = "https://github.com/kymeria/dropout"
+license = "MIT"
+keywords = ["drop"]
+categories = ["concurrency", "data-structures"]
+
+
+[dependencies]
+
