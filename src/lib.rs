@@ -62,7 +62,6 @@ use std::sync::Arc;
 ///
 /// assert!(dropout_time < std_time);
 /// ```
-#[derive(Clone)]
 pub struct Dropper<T: Send>(Arc<inner::Dropper<T>>);
 
 impl<T: Send + 'static> Dropper<T> {
@@ -88,8 +87,15 @@ impl<T: Send + 'static> Default for Dropper<T> {
     }
 }
 
+impl<T: Send + 'static> Clone for Dropper<T> {
+    fn clone(&self) -> Self {
+        Self(Arc::clone(&self.0))
+    }
+}
+
 mod inner {
     use std::{sync::mpsc, thread};
+
     pub struct Dropper<T: Send> {
         drop_sender: Option<mpsc::Sender<T>>,
         thread_handle: Option<thread::JoinHandle<()>>,
