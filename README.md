@@ -18,7 +18,7 @@ fn make_heavy_object() -> HeavyObject {
 println!("Allocating a heavy object");
 let first_heavy_object = make_heavy_object();
 
-println!("Duplicating that vector");
+println!("Duplicating that heavy object");
 let second_heavy_object = first_heavy_object.clone();
 
 // Create a dropper, dropping `Vec<Vec<String>>`.
@@ -40,8 +40,7 @@ Output is (can be):
 
 ```
 Allocating a heavy object
-Duplicating that vector
-Dropping the vectors
+Duplicating that heavy object
 Duration of dropout: 7.479µs
 Duration of std drop: 50.864814ms
 ```
