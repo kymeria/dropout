@@ -1,6 +1,6 @@
 # dropout
 
-A utility type that allows you to defer dropping your data to a background thread.
+A small library to send your value to be dropped out of your thread.
 Inspired by [this article](https://abramov.io/rust-dropping-things-in-another-thread) by Aaron Abramov and [defer-drop crate](https://github.com/Lucretiel/defer-drop)
 
 ## Simple example
@@ -48,19 +48,27 @@ Duration of std drop: 50.864814ms
 
 ## Difference with defer-drop
 
-Defer-drop use one global background thread to drop any object type.
-- All object are send to the background thread through a Box
-- This is made automatically by wrapping the object into a `DeferDrop` which will
-  send the object to drop thread when wrapper is drop.
+### API
 
-This is nice as you don't need to manage any thing else than your `DeferDrop` which deref to `T`.
-But is may be complex when you have to pass you object to a library expected a `T` or `impl Trait`.
+Defer-drop use one global background thread to drop any type.
+- All values are send to the background thread through a `Box`.
+- You have to create a `DeferDrop` which will wrap your value and send it to drop thread when wrapper is drop.
 
-Dropout take the opposite idea:
+Dropout take the opposite direction:
 - You create a Dropper which accept (and take ownership) of a `T`.
+- You have one thread per dropper.
 - You handle `T` object and explicitly defer the drop at end.
 
-Licensing differences:
+So your manipulating `T` value instead of `DeferDrop<T>`.
+But you have to be explicit about droping the value.
+
+### Guarantees
+
+Defer-drop doesn't guaranty values are actually dropped as the main thread may finish before drop thread has dropped all the values.
+`Dropper` wait (and so, block at drop) for the background thread to finish (and drop all values) before being drop.
+
+### Licensing differences
+
 - defer-drop is licensed under MPL-2.0
 - dropout is licensed under MIT
 
@@ -117,11 +125,10 @@ fn do_stuff_with_u32(object: Box<dyn MyTrait>) {
 
 ## Notes
 
-Carefully consider whether this pattern is necessary for your use case.
-Like all worker-thread abstractions, sending the value to a separate thread comes with its own costs, so it should
-only be done if performance profiling indicates that it's a performance gain.
+Dropout (as defer-drop) is not a silver bullet. Sending the value to another thread is costly and it may be counter productive.
+Always do som performance profiling before using such crates.
 
-Dropped values are enqueued in an unbounded channel to be consumed by dropping thread; if you produce more garbage
+Dropped values are enqueued in an unbounded channel to be consumed by dropping thread; if you produce more values
 than the thread can handle, this will cause unbounded memory consumption.
 There is currently no way for the thread to signal or block if it is overwhelmed.
 
