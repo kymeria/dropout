@@ -94,16 +94,17 @@ impl<T: Send + 'static> Clone for Dropper<T> {
 }
 
 mod inner {
-    use std::{sync::mpsc, thread};
+    use crossbeam_channel::{unbounded, Sender};
+    use std::thread;
 
     pub struct Dropper<T: Send> {
-        drop_sender: Option<mpsc::Sender<T>>,
+        drop_sender: Option<Sender<T>>,
         thread_handle: Option<thread::JoinHandle<()>>,
     }
 
     impl<T: Send + 'static> Dropper<T> {
         pub fn new() -> Self {
-            let (drop_sender, drop_receiver) = mpsc::channel();
+            let (drop_sender, drop_receiver) = unbounded();
             let thread_handle = thread::Builder::new()
                 .name("Dropout".into())
                 .spawn(move || while let Ok(_) = drop_receiver.recv() {})

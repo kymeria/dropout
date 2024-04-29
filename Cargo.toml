@@ -11,4 +11,5 @@ categories = ["concurrency", "data-structures"]
 
 
 [dependencies]
+crossbeam-channel = "0.5.12"
 
