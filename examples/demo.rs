@@ -1,5 +1,6 @@
 use std::collections::HashMap;
 
+use dropout::Dropper;
 use std::time::{Duration, Instant};
 
 fn timer(f: impl FnOnce()) -> Duration {
@@ -23,7 +24,7 @@ fn main() {
     let second_heavy_object = first_heavy_object.clone();
 
     // Create a dropper, dropping `HeavyObject`.
-    let dropper = dropout::new_dropper();
+    let dropper = Dropper::new();
 
     // This is a special case for this small test.
     // The closure will explictly drop `first_heavy_object` but also implicitly drop the
